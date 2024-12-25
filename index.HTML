@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pulsating Heart Animation</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: black;
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.6.0/p5.min.js"></script>
+</head>
+<body>
+    <script>
+        let pointsInHeart = 10000;
+        let minScale = 1;
+        let maxScale = 14;
+        let scale = minScale;
+        let increasing = true;
+
+        function setup() {
+            createCanvas(windowWidth, windowHeight);
+            noStroke();
+        }
+
+        function heartFunction(t, shrinkRatio) {
+            let x = 16 * pow(sin(t), 3);
+            let y = -(13 * cos(t) - 5 * cos(2 * t) - 2 * cos(3 * t) - cos(4 * t)); // Negate y to flip it
+            x *= shrinkRatio;
+            y *= shrinkRatio;
+            x += width / 2;
+            y += height / 2;
+            return [x, y];
+        }
+
+        function scatterInside(x, y, beta = 0.05) {
+            let ratioX = -beta * log(random());
+            let ratioY = -beta * log(random());
+            let dx = ratioX * (x - width / 2);
+            let dy = ratioY * (y - height / 2);
+            return [x - dx, y - dy];
+        }
+
+        function drawHeartBackground(scale) {
+            background(0);
+            for (let i = 0; i < pointsInHeart; i++) {
+                let t = random(0, TWO_PI);
+                let [x, y] = heartFunction(t, scale);
+                [x, y] = scatterInside(x, y);
+                let radius = random(0.1, 0.3) * 10;
+                fill(255, 105, 180); // Heart pink color
+                ellipse(x, y, radius, radius);
+            }
+        }
+
+        function draw() {
+            drawHeartBackground(scale);
+
+            // Pulsating effect
+            if (increasing) {
+                scale += 0.2;
+                if (scale >= maxScale) {
+                    increasing = false;
+                }
+            } else {
+                scale -= 0.2;
+                if (scale <= minScale) {
+                    increasing = true;
+                }
+            }
+        }
+
+        function windowResized() {
+            resizeCanvas(windowWidth, windowHeight);
+        }
+    </script>
+</body>
+</html>
